@@ -336,10 +336,10 @@ def start_game():
             spins-=1           
             print()
 
-        print("Your history of spins: ", flush = True)       #printing the user's history of spins
-        print("*****************************", flush = True)
-        print()
-        print_history(history)
+            print("Your history of spins: ", flush = True)       #printing the user's history of spins
+            print("*****************************", flush = True)
+            print()
+            print_history(history)
 
         # Ask if they want to continue
         while True:
