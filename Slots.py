@@ -308,11 +308,16 @@ def start_game():
                 print(f"You earned {extra_spins} free spin{'s' if extra_spins > 1 else ''}!", flush = True)
                 sound_freespin.play()
                 spins += extra_spins
+                is_freespin = True
+            else:
+                is_freespin = False
                 
             if prize == 0:                              #User lost
                 time.sleep(0.5)
                 print("Sorry, you lost this round.", flush = True)
                 time.sleep(0.5)
+                if is_freespin == True:
+                    balance+=bet
                 show_balance(balance)
                 sound_lose.play()
 
@@ -329,7 +334,10 @@ def start_game():
                 time.sleep(0.5)
                 print(f"Congratulations!!! You won ${prize:.2f}", flush = True)
                 time.sleep(0.5)
-                balance += prize
+                if is_freespin ==True:
+                    balance += prize + bet
+                else:
+                    balance += prize
                 show_balance(balance)
                 sound_win.play()
 
