@@ -65,7 +65,8 @@ def payout(row, bet):
         elif row[0] == jackpot:
             sound_jackpot.play()
             return bet * 100
-    return 0
+    else:
+        return 0
 
 #Method to check for free spins
 def free_spins(row):
@@ -86,7 +87,8 @@ def free_spins(row):
             return 20
     elif (row[0] == row[1]) or (row[1] == row[2]) or (row[0] == row[2]):
         return 1
-    return 0
+    else:
+        return 0
 
 #Method to print a legend of the rewards from the combinations of symbols
 def print_legend():
@@ -288,8 +290,10 @@ def start_game():
         print("-----------------------------")
         print()
         
-        while spins > 0:                                           #spin state
-            balance -= bet                                  #decreasing the balance
+        extra_spins = 0          #initializing number of free spins outside of the loop, so it does not reset to 0 every spin
+
+        while spins > 0 or extra_spins > 0:
+            is_freespin = False          #variable to check whether the spin is free
             row = spin()
             print_result(row)
             time.sleep(1)
@@ -301,23 +305,20 @@ def start_game():
             size_history = len(history) 
             if size_history > max_history:               #removing elements from the history of needed
                 history.pop(0)
-            extra_spins = free_spins(row)
+            extra_spins = extra_spins + free_spins(row)
 
             if extra_spins > 0:                         #checking whether the user got any extra spins
                 time.sleep(0.5)
                 print(f"You earned {extra_spins} free spin{'s' if extra_spins > 1 else ''}!", flush = True)
                 sound_freespin.play()
-                spins += extra_spins
-                is_freespin = True
+                is_freespin = True                 #setting the free spin checker to true
             else:
-                is_freespin = False
-                
+                balance=balance - bet              #decrementing the bet
+                   
             if prize == 0:                              #User lost
                 time.sleep(0.5)
                 print("Sorry, you lost this round.", flush = True)
                 time.sleep(0.5)
-                if is_freespin == True:
-                    balance+=bet
                 show_balance(balance)
                 sound_lose.play()
 
@@ -330,18 +331,21 @@ def start_game():
                     time.sleep(2)
                     os.system('cls' if os.name == 'nt' else 'clear')
                     return
-            else:                                    #User won
+            elif prize != 0:                                    #User won
                 time.sleep(0.5)
                 print(f"Congratulations!!! You won ${prize:.2f}", flush = True)
                 time.sleep(0.5)
-                if is_freespin ==True:
-                    balance += prize + bet
-                else:
-                    balance += prize
+                balance = balance + prize
                 show_balance(balance)
                 sound_win.play()
 
-            spins-=1           
+            if is_freespin == True:          #check for whether the spin was free or a normal one
+                extra_spins = extra_spins - 1
+                if extra_spins == 0:
+                    is_freespin = False
+            else:
+                spins-=1   
+                        
             print()
 
             print("Your history of spins: ", flush = True)       #printing the user's history of spins
